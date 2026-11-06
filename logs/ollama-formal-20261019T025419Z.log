@@ -1,0 +1,13 @@
+[apbench] loading llama-fp16 (ollama)
+[apbench] llama-fp16: precision=16
+[apbench] loading llama32-q3km (ollama)
+[apbench] llama32-q3km: precision=3
+[apbench] loading llama32-q4km (ollama)
+[apbench] llama32-q4km: precision=4
+[apbench] loading llama32-q5km (ollama)
+[apbench] llama32-q5km: precision=5
+[apbench] loading llama32-q6k (ollama)
+[apbench] llama32-q6k: precision=6
+[apbench] loading llama32-q8 (ollama)
+[apbench] llama32-q8: precision=8
+[apbench] results: /mnt/d/MingzhiCai/Rayze/Folder/InternationalCourses/WashU/Master_Degree/Test_Project/Testing_Demo/results/ollama-llama32-3b-formal-20261019T025421Z

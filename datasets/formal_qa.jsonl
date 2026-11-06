@@ -1,0 +1,100 @@
+{"id":"math_001","prompt":"What is 47 + 68?","reference":"115","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_002","prompt":"What is 144 divided by 12?","reference":"12","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_003","prompt":"What is 17 multiplied by 8?","reference":"136","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_004","prompt":"What is 205 minus 87?","reference":"118","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_005","prompt":"What is 15 percent of 240?","reference":"36","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_006","prompt":"What is the square root of 196?","reference":"14","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_007","prompt":"What is 3 to the fourth power?","reference":"81","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_008","prompt":"A box contains 24 pencils. If 7 are removed, how many remain?","reference":"17","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_009","prompt":"What is the greatest common divisor of 48 and 18?","reference":"6","metadata":{"category":"arithmetic","difficulty":"medium","answer_type":"number"}}
+{"id":"math_010","prompt":"What is the least common multiple of 6 and 15?","reference":"30","metadata":{"category":"arithmetic","difficulty":"medium","answer_type":"number"}}
+{"id":"math_011","prompt":"A rectangle has length 13 and width 7. What is its area?","reference":"91","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_012","prompt":"A triangle has base 10 and height 9. What is its area?","reference":"45","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_013","prompt":"If 5 notebooks cost 20 dollars in total, how many dollars does one notebook cost?","reference":"4","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_014","prompt":"What is the arithmetic mean of 6, 10, 14, and 18?","reference":"12","metadata":{"category":"arithmetic","difficulty":"medium","answer_type":"number"}}
+{"id":"math_015","prompt":"A car travels 180 miles in 3 hours at a constant speed. What is its speed in miles per hour?","reference":"60","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_016","prompt":"Solve for x: 4x + 7 = 31.","reference":"6","metadata":{"category":"arithmetic","difficulty":"medium","answer_type":"number"}}
+{"id":"math_017","prompt":"What is 7/8 expressed as a decimal?","reference":"0.875","metadata":{"category":"arithmetic","difficulty":"medium","answer_type":"number"}}
+{"id":"math_018","prompt":"An item costs 80 dollars and is discounted by 25 percent. What is the sale price in dollars?","reference":"60","metadata":{"category":"arithmetic","difficulty":"medium","answer_type":"number"}}
+{"id":"math_019","prompt":"A sequence begins 2, 5, 8, 11. What is the next number?","reference":"14","metadata":{"category":"arithmetic","difficulty":"easy","answer_type":"number"}}
+{"id":"math_020","prompt":"What is the remainder when 157 is divided by 12?","reference":"1","metadata":{"category":"arithmetic","difficulty":"medium","answer_type":"number"}}
+{"id":"science_001","prompt":"What is the chemical symbol for gold?","reference":"Au","metadata":{"category":"science","difficulty":"easy","answer_type":"symbol"}}
+{"id":"science_002","prompt":"Which planet is known as the Red Planet?","reference":"Mars","metadata":{"category":"science","difficulty":"easy","answer_type":"entity"}}
+{"id":"science_003","prompt":"What gas do plants absorb from the atmosphere during photosynthesis?","reference":"carbon dioxide","metadata":{"category":"science","difficulty":"easy","answer_type":"term"}}
+{"id":"science_004","prompt":"What is the largest organ in the human body?","reference":"skin","metadata":{"category":"science","difficulty":"easy","answer_type":"term"}}
+{"id":"science_005","prompt":"What force keeps planets in orbit around the Sun?","reference":"gravity","metadata":{"category":"science","difficulty":"easy","answer_type":"term"}}
+{"id":"science_006","prompt":"What is the SI unit of electric current?","reference":"ampere","metadata":{"category":"science","difficulty":"medium","answer_type":"unit"}}
+{"id":"science_007","prompt":"What part of a cell contains most of its genetic material?","reference":"nucleus","metadata":{"category":"science","difficulty":"easy","answer_type":"term"}}
+{"id":"science_008","prompt":"What is the boiling point of pure water at sea level in degrees Celsius?","reference":"100","metadata":{"category":"science","difficulty":"easy","answer_type":"number"}}
+{"id":"science_009","prompt":"What type of blood cell carries oxygen through the body?","reference":"red blood cell","metadata":{"category":"science","difficulty":"easy","answer_type":"term"}}
+{"id":"science_010","prompt":"What is the process by which a liquid changes into a gas at its surface?","reference":"evaporation","metadata":{"category":"science","difficulty":"medium","answer_type":"term"}}
+{"id":"science_011","prompt":"Which subatomic particle has a negative electric charge?","reference":"electron","metadata":{"category":"science","difficulty":"easy","answer_type":"term"}}
+{"id":"science_012","prompt":"What is the nearest star to Earth?","reference":"the Sun","metadata":{"category":"science","difficulty":"easy","answer_type":"entity"}}
+{"id":"science_013","prompt":"What scale is used to measure mineral hardness?","reference":"Mohs scale","metadata":{"category":"science","difficulty":"medium","answer_type":"term"}}
+{"id":"science_014","prompt":"What is the basic unit of heredity?","reference":"gene","metadata":{"category":"science","difficulty":"easy","answer_type":"term"}}
+{"id":"science_015","prompt":"Which layer of Earth lies directly beneath the crust?","reference":"mantle","metadata":{"category":"science","difficulty":"easy","answer_type":"term"}}
+{"id":"science_016","prompt":"What instrument measures atmospheric pressure?","reference":"barometer","metadata":{"category":"science","difficulty":"medium","answer_type":"term"}}
+{"id":"science_017","prompt":"What is the chemical formula for water?","reference":"H2O","metadata":{"category":"science","difficulty":"easy","answer_type":"symbol"}}
+{"id":"science_018","prompt":"Which vitamin is primarily produced in human skin through sunlight exposure?","reference":"vitamin D","metadata":{"category":"science","difficulty":"medium","answer_type":"term"}}
+{"id":"science_019","prompt":"What is the name of the process in which a solid changes directly into a gas?","reference":"sublimation","metadata":{"category":"science","difficulty":"medium","answer_type":"term"}}
+{"id":"science_020","prompt":"What organ pumps blood through the human circulatory system?","reference":"heart","metadata":{"category":"science","difficulty":"easy","answer_type":"term"}}
+{"id":"geography_001","prompt":"What is the capital of France?","reference":"Paris","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_002","prompt":"What is the capital of Japan?","reference":"Tokyo","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_003","prompt":"Which country contains the city of Cairo?","reference":"Egypt","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_004","prompt":"What is the largest ocean on Earth?","reference":"Pacific Ocean","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_005","prompt":"On which continent is Kenya located?","reference":"Africa","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_006","prompt":"What river flows through London?","reference":"Thames","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_007","prompt":"What is the capital of Canada?","reference":"Ottawa","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_008","prompt":"Which mountain range contains Mount Everest?","reference":"Himalayas","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_009","prompt":"What is the smallest continent by land area?","reference":"Australia","metadata":{"category":"geography","difficulty":"medium","answer_type":"entity"}}
+{"id":"geography_010","prompt":"Which country has the city of Barcelona?","reference":"Spain","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_011","prompt":"What is the capital of Brazil?","reference":"Brasilia","metadata":{"category":"geography","difficulty":"medium","answer_type":"entity"}}
+{"id":"geography_012","prompt":"Which desert covers much of northern Africa?","reference":"Sahara","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_013","prompt":"What is the capital of New Zealand?","reference":"Wellington","metadata":{"category":"geography","difficulty":"medium","answer_type":"entity"}}
+{"id":"geography_014","prompt":"Which country is directly south of the United States?","reference":"Mexico","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_015","prompt":"What sea separates Europe from Africa?","reference":"Mediterranean Sea","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_016","prompt":"What is the capital of South Korea?","reference":"Seoul","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_017","prompt":"Which river flows through Paris?","reference":"Seine","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_018","prompt":"What is the capital of Argentina?","reference":"Buenos Aires","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_019","prompt":"On which continent is the Amazon rainforest primarily located?","reference":"South America","metadata":{"category":"geography","difficulty":"easy","answer_type":"entity"}}
+{"id":"geography_020","prompt":"Which country contains the ancient city of Petra?","reference":"Jordan","metadata":{"category":"geography","difficulty":"medium","answer_type":"entity"}}
+{"id":"computing_001","prompt":"What does CPU stand for?","reference":"central processing unit","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_002","prompt":"What binary digit represents the decimal number one?","reference":"1","metadata":{"category":"computing","difficulty":"easy","answer_type":"number"}}
+{"id":"computing_003","prompt":"Which protocol is commonly used to securely browse websites?","reference":"HTTPS","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_004","prompt":"What data structure follows the last-in, first-out principle?","reference":"stack","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_005","prompt":"What does RAM stand for?","reference":"random access memory","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_006","prompt":"Which port number is the default for HTTPS?","reference":"443","metadata":{"category":"computing","difficulty":"medium","answer_type":"number"}}
+{"id":"computing_007","prompt":"What is the name of the unique identifier used to locate a resource on the web?","reference":"URL","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_008","prompt":"Which Boolean operator is true only when both operands are true?","reference":"AND","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_009","prompt":"What does SQL stand for?","reference":"structured query language","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_010","prompt":"Which network device forwards packets between different networks?","reference":"router","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_011","prompt":"What is the base of the hexadecimal number system?","reference":"16","metadata":{"category":"computing","difficulty":"easy","answer_type":"number"}}
+{"id":"computing_012","prompt":"Which Git command creates a local copy of a remote repository?","reference":"git clone","metadata":{"category":"computing","difficulty":"easy","answer_type":"command"}}
+{"id":"computing_013","prompt":"What type of malware encrypts files and demands payment for recovery?","reference":"ransomware","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_014","prompt":"What does DNS translate domain names into?","reference":"IP addresses","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_015","prompt":"What is the time complexity of binary search on a sorted array?","reference":"O(log n)","metadata":{"category":"computing","difficulty":"medium","answer_type":"notation"}}
+{"id":"computing_016","prompt":"Which HTTP method is conventionally used to retrieve a resource?","reference":"GET","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_017","prompt":"What does JSON stand for?","reference":"JavaScript Object Notation","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_018","prompt":"Which layer of the OSI model is responsible for routing packets?","reference":"network layer","metadata":{"category":"computing","difficulty":"medium","answer_type":"term"}}
+{"id":"computing_019","prompt":"What is the standard file extension for a Python source file?","reference":".py","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"computing_020","prompt":"Which database key uniquely identifies each row in a table?","reference":"primary key","metadata":{"category":"computing","difficulty":"easy","answer_type":"term"}}
+{"id":"logic_001","prompt":"All roses are flowers. Some flowers fade quickly. Does it necessarily follow that some roses fade quickly? Answer yes or no.","reference":"no","metadata":{"category":"logic","difficulty":"medium","answer_type":"boolean"}}
+{"id":"logic_002","prompt":"If today is Monday, what day of the week will it be 10 days from today?","reference":"Thursday","metadata":{"category":"logic","difficulty":"easy","answer_type":"entity"}}
+{"id":"logic_003","prompt":"A pattern is 2, 4, 8, 16. What number comes next?","reference":"32","metadata":{"category":"logic","difficulty":"easy","answer_type":"number"}}
+{"id":"logic_004","prompt":"If every A is a B and every B is a C, is every A necessarily a C? Answer yes or no.","reference":"yes","metadata":{"category":"logic","difficulty":"easy","answer_type":"boolean"}}
+{"id":"logic_005","prompt":"Three people stand in a line. Ana is before Ben, and Ben is before Chen. Who is in the middle?","reference":"Ben","metadata":{"category":"logic","difficulty":"easy","answer_type":"entity"}}
+{"id":"logic_006","prompt":"A clock shows 3:00. What is the smaller angle in degrees between the hour hand and minute hand?","reference":"90","metadata":{"category":"logic","difficulty":"medium","answer_type":"number"}}
+{"id":"logic_007","prompt":"If a statement is true, what is the truth value of its logical negation?","reference":"false","metadata":{"category":"logic","difficulty":"easy","answer_type":"boolean"}}
+{"id":"logic_008","prompt":"A bag contains only red and blue balls. If a ball is drawn and it is not red, what color must it be?","reference":"blue","metadata":{"category":"logic","difficulty":"easy","answer_type":"term"}}
+{"id":"logic_009","prompt":"Complete the letter pattern: A, C, E, G, __.","reference":"I","metadata":{"category":"logic","difficulty":"easy","answer_type":"letter"}}
+{"id":"logic_010","prompt":"If 2 cats catch 2 mice in 2 minutes at equal constant rates, how many mice do 4 cats catch in 2 minutes?","reference":"4","metadata":{"category":"logic","difficulty":"medium","answer_type":"number"}}
+{"id":"logic_011","prompt":"A book is to the left of a lamp, and the lamp is to the left of a vase. Which object is farthest right?","reference":"vase","metadata":{"category":"logic","difficulty":"easy","answer_type":"entity"}}
+{"id":"logic_012","prompt":"What number completes the sequence 1, 1, 2, 3, 5, 8, __?","reference":"13","metadata":{"category":"logic","difficulty":"easy","answer_type":"number"}}
+{"id":"logic_013","prompt":"If no birds are mammals and all sparrows are birds, can any sparrow be a mammal? Answer yes or no.","reference":"no","metadata":{"category":"logic","difficulty":"easy","answer_type":"boolean"}}
+{"id":"logic_014","prompt":"A farmer has 12 sheep. All but 5 leave the field. How many sheep remain?","reference":"5","metadata":{"category":"logic","difficulty":"medium","answer_type":"number"}}
+{"id":"logic_015","prompt":"Which number does not belong in the set 2, 3, 5, 9, 11?","reference":"9","metadata":{"category":"logic","difficulty":"medium","answer_type":"number"}}
+{"id":"logic_016","prompt":"If the code for CAT is DBU by shifting each letter forward once, what is the code for DOG?","reference":"EPH","metadata":{"category":"logic","difficulty":"medium","answer_type":"text"}}
+{"id":"logic_017","prompt":"A cube has how many faces?","reference":"6","metadata":{"category":"logic","difficulty":"easy","answer_type":"number"}}
+{"id":"logic_018","prompt":"If five machines make five parts in five minutes at equal constant rates, how many minutes do 100 machines need to make 100 parts?","reference":"5","metadata":{"category":"logic","difficulty":"medium","answer_type":"number"}}
+{"id":"logic_019","prompt":"In a race, Maya finished ahead of Noah but behind Olivia. Who finished first among the three?","reference":"Olivia","metadata":{"category":"logic","difficulty":"easy","answer_type":"entity"}}
+{"id":"logic_020","prompt":"A number is even, greater than 10, less than 15, and divisible by 3. What is the number?","reference":"12","metadata":{"category":"logic","difficulty":"easy","answer_type":"number"}}

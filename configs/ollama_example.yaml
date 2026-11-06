@@ -1,0 +1,64 @@
+run_name: ollama-int3-int8
+output_dir: ../results
+repeats: 3
+warmup_runs: 1
+resource_sample_interval_s: 0.1
+
+generation:
+  max_new_tokens: 64
+  temperature: 0.0
+  top_p: 1.0
+  seed: 42
+
+# Replace these placeholders with Ollama tags imported from quantized GGUF files
+# derived from the SAME base checkpoint. /api/ps will record Ollama's actual
+# quantization_level, so a mislabeled tag is visible in the raw results.
+models:
+  - id: llama-fp16
+    backend: ollama
+    model: llama3.2:3b-instruct-fp16
+    precision_bits: 16
+    baseline: true
+    keep_alive: 5m
+  
+  - id: llama32-q3km
+    backend: ollama
+    model: llama3.2:3b-instruct-q3_K_M
+    precision_bits: 3
+    keep_alive: 5m
+  
+  - id: llama32-q4km
+    backend: ollama
+    model: llama3.2:3b-instruct-q4_K_M
+    precision_bits: 4
+    keep_alive: 5m
+
+  - id: llama32-q5km
+    backend: ollama
+    model: llama3.2:3b-instruct-q5_K_M
+    precision_bits: 5
+    keep_alive: 5m
+
+  - id: llama32-q6k
+    backend: ollama
+    model: llama3.2:3b-instruct-q6_K
+    precision_bits: 6
+    keep_alive: 5m
+
+  - id: llama32-q8
+    backend: ollama
+    model: llama3.2:3b-instruct-q8_0
+    precision_bits: 8
+    keep_alive: 5m
+
+datasets:
+  - id: tiny-qa
+    path: ../datasets/tiny_qa.jsonl
+    task: qa
+    max_samples: 10
+    metrics: [exact_match, contains_reference, token_f1, rouge_l]
+    prompt_templates:
+      - "Answer with only the final answer. Question: {prompt}"
+      - "Question: {prompt}\nGive a concise and accurate answer."
+      - "Solve the following problem carefully, then print only the answer: {prompt}"
+

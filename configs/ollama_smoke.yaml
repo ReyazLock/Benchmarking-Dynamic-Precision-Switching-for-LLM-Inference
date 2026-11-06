@@ -1,0 +1,33 @@
+run_name: ollama-llama32-smoke
+output_dir: ../results
+repeats: 2
+warmup_runs: 1
+resource_sample_interval_s: 0.1
+
+generation:
+  max_new_tokens: 64
+  temperature: 0.0
+  top_p: 1.0
+  seed: 42
+
+models:
+  - id: llama32-latest-smoke
+    backend: ollama
+    model: llama3.2:latest
+    base_url: http://172.29.80.1:11434
+    keep_alive: 5m
+
+datasets:
+  - id: tiny-qa
+    path: ../datasets/tiny_qa.jsonl
+    task: qa
+    max_samples: 5
+    metrics:
+      - exact_match
+      - contains_reference
+      - token_f1
+      - rouge_l
+    prompt_templates:
+      - "Answer with only the final answer. Question: {prompt}"
+      - "Question: {prompt}\nGive a concise and accurate answer."
+      - "Solve the following problem carefully, then print only the answer: {prompt}"

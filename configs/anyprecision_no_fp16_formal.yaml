@@ -1,0 +1,34 @@
+run_name: native-anyprecision-int3-int8
+output_dir: ../results
+repeats: 3
+warmup_runs: 1
+
+generation:
+  max_new_tokens: 64
+  temperature: 0.0
+  top_p: 1.0
+  seed: 42
+
+models:
+  - id: tinyllama-anyprecision-w3-w8
+    backend: anyprecision
+    model: /mnt/d/MingzhiCai/Rayze/Folder/InternationalCourses/WashU/Master_Degree/ANYLLM/any-precision-llm/cache_tinyllama_formal/packed/anyprec-(TinyLlama-1.1B-Chat-v1.0)-w8_orig3-gc1-c4_s100_blk512
+    precisions: [3, 4, 5, 6, 7, 8]
+    baseline: false
+    device: cuda
+    trust_remote_code: false
+
+datasets:
+  - id: formal-qa
+    path: ../datasets/formal_qa.jsonl
+    task: qa
+    max_samples: 100
+    metrics: 
+      - exact_match
+      - contains_reference
+      - token_f1
+      - rouge_l
+    prompt_templates:
+      - "Answer with only the final answer. Question: {prompt}"
+      - "Question: {prompt}\nGive a concise and accurate answer."
+      - "Solve the following problem carefully, then print only the answer: {prompt}"

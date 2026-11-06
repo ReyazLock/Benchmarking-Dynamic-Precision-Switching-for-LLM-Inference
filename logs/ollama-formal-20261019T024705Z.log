@@ -1,0 +1,19 @@
+[apbench] loading llama-fp16 (ollama)
+[apbench] llama-fp16: precision=16
+Traceback (most recent call last):
+  File "/mnt/d/MingzhiCai/Rayze/Folder/InternationalCourses/WashU/Master_Degree/ANYLLM/any-precision-llm/.venv311/bin/apbench", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/mnt/d/MingzhiCai/Rayze/Folder/InternationalCourses/WashU/Master_Degree/Test_Project/Testing_Demo/src/apbench/cli.py", line 54, in main
+    output = run_benchmark(load_config(args.config))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/MingzhiCai/Rayze/Folder/InternationalCourses/WashU/Master_Degree/Test_Project/Testing_Demo/src/apbench/runner.py", line 175, in run_benchmark
+    warmup_case = load_jsonl(config.datasets[0].path, 1)[0]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/MingzhiCai/Rayze/Folder/InternationalCourses/WashU/Master_Degree/Test_Project/Testing_Demo/src/apbench/datasets.py", line 11, in load_jsonl
+    with path.open("r", encoding="utf-8") as handle:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/d/MingzhiCai/Rayze/Folder/InternationalCourses/WashU/Master_Degree/Test_Project/Testing_Demo/datasets/formal_qa.jsonl'

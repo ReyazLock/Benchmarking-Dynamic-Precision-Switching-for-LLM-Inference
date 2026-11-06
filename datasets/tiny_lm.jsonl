@@ -1,0 +1,4 @@
+{"id":"lm-1","text":"Large language models predict the next token from the preceding context."}
+{"id":"lm-2","text":"Quantization reduces numerical precision to lower memory and computation costs."}
+{"id":"lm-3","text":"Reproducible experiments use fixed datasets, seeds, software versions, and hardware."}
+

@@ -1,0 +1,44 @@
+run_name: tinyllama-workload-qa
+output_dir: ../results
+repeats: 3
+warmup_runs: 2
+
+# Inclusive input-token ranges; choose two or three contiguous ranges.
+workload_ranges:
+  - {id: small, min_tokens: 0, max_tokens: 128}
+  - {id: medium, min_tokens: 129, max_tokens: 512}
+  - {id: large, min_tokens: 513}
+
+generation:
+  max_new_tokens: 64
+  temperature: 0.0
+  top_p: 1.0
+  seed: 42
+
+models:
+  - id: tinyllama-fp16
+    backend: huggingface
+    model: TinyLlama/TinyLlama-1.1B-Chat-v1.0
+    precision_bits: 16
+    baseline: true
+    device: cuda
+    trust_remote_code: false
+    extra_options:
+      dtype: float16
+      use_fast: false
+
+datasets:
+  - id: workload_qa_30
+    path: ../datasets/workload_qa_30.jsonl
+    task: qa
+    max_samples: 30
+    metrics: 
+      - exact_match
+      - contains_reference
+      - token_f1
+      - rouge_l
+    prompt_templates:
+      - "Answer with only the final answer. Question: {prompt}"
+      - "Question: {prompt}\nGive a concise and accurate answer."
+      - "Solve the following problem carefully, then print only the answer: {prompt}"
+

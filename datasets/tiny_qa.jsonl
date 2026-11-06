@@ -1,0 +1,6 @@
+{"id":"math-1","prompt":"What is 17 + 25?","reference":"42","metadata":{"category":"arithmetic"}}
+{"id":"math-2","prompt":"A box has 12 red balls and 8 blue balls. How many balls are there?","reference":"20","metadata":{"category":"arithmetic"}}
+{"id":"fact-1","prompt":"What is the capital of France?","reference":"Paris","metadata":{"category":"knowledge"}}
+{"id":"logic-1","prompt":"If all robins are birds and all birds have wings, do robins have wings? Answer yes or no.","reference":"yes","metadata":{"category":"logic"}}
+{"id":"format-1","prompt":"Write the lowercase form of QUANTIZATION.","reference":"quantization","metadata":{"category":"instruction"}}
+
