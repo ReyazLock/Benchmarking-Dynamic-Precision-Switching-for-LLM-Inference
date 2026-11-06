@@ -1,182 +1,161 @@
-# AnyPrecision Bench
+# AnyPrecision-Bench: TinyLlama Experiment Guide
 
-这是一个面向研究实验的 Python 测试框架，用于比较 FP16 与 INT5–INT8 LLM 在质量、资源、速度和 Prompt 稳定性上的差异。它同时支持：
+This project uses Python to compare the FP16 baseline of TinyLlama-1.1B-Chat-v1.0 against Any-Precision packed model inference at w3 to w8. It measures answer quality, time to first token (TTFT), decoding speed (TPS), GPU memory, and performance across different input lengths. The native backend switches `precision` on the **same packed artifact**. The earlier experiments that used multiple GGUF files in Ollama are not this native Any-Precision test.
 
-- **Ollama 后端**：测试已经导入 Ollama 的独立量化模型；
-- **Any-Precision 原生后端**：从同一个 bitplane packed model 在 5/6/7/8 bit 间切换，直接验证论文的核心机制；
-- **Hugging Face 后端**：作为本地 FP16/BF16 基线；
-- **量化阶段 profiler**：分别记录 gradients、quantize、pack 三个阶段的时间与资源。
+## Current Progress
 
-## 必须先明确的兼容性边界
+- Uses the public model `TinyLlama/TinyLlama-1.1B-Chat-v1.0`. Quantization and packing are complete with seed precision 3 and parent precision 8, and the native CUDA extension and the packed model can both be loaded.
+- Planned comparison: w3, w4, w5, w6, w7, w8 against FP16 of the same base checkpoint. Workload, TTFT, TPS, and prompt-sensitivity statistics have been added.
+- For the GPU memory experiment, FP16 and the packed model run in **separate `apbench run` processes**. Keep the GPU idle, and record the actual model path, checkpoint revision, and run order.
 
-Ollama 不能替代 Any-Precision 的原生 serving engine。Any-Precision 使用自定义 CUDA kernel 和 bitplane 权重表示，在同一个 packed artifact 上动态选择精度；Ollama 通常加载独立的 GGUF 量化文件。因此：
+> The repository's current `configs/anyprecision_example.yaml` still contains the generic `/models/base-llama` path. The two TinyLlama configs below are new example files; you must replace the packed model path and copy the data into the corresponding directory.
 
-1. 使用 Ollama 可以回答“不同已部署量化模型的实际速度、显存和质量怎样”；
-2. 使用原生后端才能回答“同一 Any-Precision 模型能否以低额外存储成本支持 INT5–INT8 动态切换”；
-3. Ollama 配置中的 `precision_bits` 是实验标签。框架会把 `/api/ps` 返回的实际 `quantization_level` 写入结果，防止把文件名误当成真实位宽；
-4. 常见 GGUF 量化格式并不保证恰好存在论文意义上的每一个整数位宽，特别是 INT7。不要把 `Q5_K_M` 与 Any-Precision 的 5-bit 算法视为完全相同的量化方法。
+## Environment Setup (WSL)
 
-## 安装
-
-需要 Python 3.11+。
+Run from the Bench project root. For the Python 3.11 virtual environment, you can keep using the `.venv311` in which Any-Precision is already installed:
 
 ```bash
-cd anyprecision-bench
-python -m venv .venv
-source .venv/bin/activate
-pip install -e '.[dev]'
+cd /path/to/Testing_Demo
+source /path/to/any-precision-llm/.venv311/bin/activate
+python -m pip install -e '.[dev,native]'
+python -m pytest
+python -c 'import torch, any_precision_ext; print(torch.cuda.is_available())'
+nvidia-smi
 ```
 
-仅使用 Ollama 时，上述安装已足够。使用原生 Any-Precision/Hugging Face 后端时：
+The final Python command should print `True`. `pip install -e` does not compile the upstream CUDA kernel; if importing `any_precision_ext` fails, you must first finish installing that extension in the Any-Precision project. The native backend does not require starting Ollama.
+
+Put the actual 30-question dataset in `datasets/` (you can copy it from its existing location). A formal QA set can later be placed separately as `formal_qa.jsonl`:
 
 ```bash
-pip install -e '.[native]'
-cd /path/to/any-precision-llm/any_precision/modules/kernels
-pip install .
+mkdir -p datasets configs results
+cp /path/to/workload_qa_30.jsonl datasets/
+wc -l datasets/workload_qa_30.jsonl
+find /path/to/any-precision-llm -type d -name 'anyprec-*' -print
 ```
 
-原生 Any-Precision 仍需满足上游项目要求：CUDA Toolkit 12+、gcc 9+，并先生成 packed model。
+From the `find` results, choose a directory that has been packed and can be loaded with `AnyPrecisionForCausalLM.from_quantized`, not a gradient or LUT cache directory. Record its full WSL path. The earlier quantization used `--seed_precision 3 --parent_precision 8 --dataset c4 --seq_len 512 --num_examples 100 --random_state 42 --cpu_only`; `--cpu_only` belongs to the quantization process, and inference still uses CUDA.
 
-## 快速开始：Ollama
+## Config A: FP16 Baseline
 
-1. 准备来自同一个 base checkpoint 的 FP16、INT5、INT6、INT7、INT8 模型文件，并分别导入 Ollama。实际可用的 GGUF 类型取决于转换/量化工具；没有真正的 7-bit artifact 时不要用其他格式冒充。
-2. 修改 `configs/ollama_example.yaml` 中五个 `model` tag。
-3. 检查配置并执行：
+Create `configs/tinyllama_fp16_workload.yaml`:
+
+```yaml
+run_name: tinyllama-fp16-workload
+output_dir: ../results
+repeats: 3
+warmup_runs: 2
+resource_sample_interval_s: 0.1
+workload_ranges:
+  - { id: small, min_tokens: 0, max_tokens: 128 }
+  - { id: medium, min_tokens: 129, max_tokens: 512 }
+  - { id: large, min_tokens: 513 }
+generation:
+  max_new_tokens: 64
+  temperature: 0.0
+  top_p: 1.0
+  seed: 42
+models:
+  - id: tinyllama-fp16
+    backend: huggingface
+    model: TinyLlama/TinyLlama-1.1B-Chat-v1.0
+    precision_bits: 16
+    baseline: true
+    device: cuda
+    extra_options: { dtype: float16 }
+datasets:
+  - id: workload-qa-30
+    path: ../datasets/workload_qa_30.jsonl
+    task: qa
+    metrics: [exact_match, contains_reference, token_f1]
+    prompt_templates: ["{prompt}"]
+```
+
+If you already have a local FP16 model snapshot, you can change `model` to its absolute directory. Do not enter an Ollama tag.
+
+## Config B: Native packed w8→w3
+
+Create `configs/tinyllama_packed_workload.yaml`, **replacing `model` with the actual packed directory**:
+
+```yaml
+run_name: tinyllama-packed-workload
+output_dir: ../results
+repeats: 3
+warmup_runs: 2
+resource_sample_interval_s: 0.1
+workload_ranges:
+  - { id: small, min_tokens: 0, max_tokens: 128 }
+  - { id: medium, min_tokens: 129, max_tokens: 512 }
+  - { id: large, min_tokens: 513 }
+generation:
+  max_new_tokens: 64
+  temperature: 0.0
+  top_p: 1.0
+  seed: 42
+models:
+  - id: tinyllama-anyprecision
+    backend: anyprecision
+    model: /absolute/wsl/path/to/tinyllama-packed
+    precisions: [8, 7, 6, 5, 4, 3]
+    device: cuda
+    trust_remote_code: true
+datasets:
+  - id: workload-qa-30
+    path: ../datasets/workload_qa_30.jsonl
+    task: qa
+    metrics: [exact_match, contains_reference, token_f1]
+    prompt_templates: ["{prompt}"]
+```
+
+All six bit widths reuse the same packed model. The order here is 8→3; if you want to study the effect of run order, create a separate 3→8 config and save its results separately. The questions, templates, generation parameters, and workload boundaries of the two configs must be identical.
+
+In the repository's current `src/apbench/metrics.py`, `rouge_l` divides by zero when the prediction and reference are both non-empty but share no tokens, so it is not enabled in the examples for now; add it back if your local version has fixed this. Each line of the JSONL data should have `id`, `prompt`, and `reference`.
+
+## Running
 
 ```bash
-apbench validate configs/ollama_example.yaml
-apbench run configs/ollama_example.yaml
+apbench validate configs/tinyllama_fp16_workload.yaml
+apbench validate configs/tinyllama_packed_workload.yaml
+test -f datasets/workload_qa_30.jsonl
+
+# Each command starts a separate process; wait for the previous one to finish before running the next
+apbench run configs/tinyllama_fp16_workload.yaml
+apbench run configs/tinyllama_packed_workload.yaml
 ```
 
-框架调用 Ollama 的 `POST /api/generate`，记录服务端报告的 token 数、load/prompt-eval/generation 时间；随后通过 `GET /api/ps` 记录驻留模型大小、VRAM 大小和真实量化格式。每个模型完成后会请求卸载，减少前一个模型对后一个模型显存采样的污染。
+`validate` checks the config format but does not verify the model files, data files, or GPU inference. For a pre-check, you can temporarily change `repeats` to 1 in both configs and add `max_samples: 2` under the dataset; restore them after confirming the results. With the formal parameters, one dataset of 30 questions × 1 template × 3 repeats gives 90 QA records for FP16 and 90 for each packed bit width, 540 in total. If `__warmup__` or `__model_load__` errors are present, investigate them before computing statistics.
 
-## 快速开始：真正的 Any-Precision INT5–INT8
+Formal QA: copy the data to `datasets/formal_qa.jsonl`, copy the two YAML files, and change `run_name` and the dataset's `id` and `path`. For a prompt-sensitivity comparison, add the **same multiple templates** to both configs; with 3 templates, multiply the record count by 3. Using only one template does not produce a meaningful cross-template comparison.
 
-先在上游项目中量化：
+## Output and Interpretation
 
-```bash
-python quantize.py /models/base-llama \
-  --seed_precision 5 \
-  --parent_precision 8 \
-  --random_state 42
-```
+Each run writes to `results/<run-name>-<UTC time>/`:
 
-将 `configs/anyprecision_example.yaml` 中的 FP16 checkpoint 和 packed model 路径改为本机路径，然后运行：
+| File                             | Contents                                                                                    |
+| -------------------------------- | ------------------------------------------------------------------------------------------- |
+| `raw_results.jsonl`              | Per-question output, metrics, tokens, timing, resources, and errors                         |
+| `summary.csv`                    | Aggregated by model, precision, dataset, and template                                       |
+| `workload_summary.csv`           | Further grouped by small / medium / large; includes sample count, TTFT, TPS, GPU memory     |
+| `prompt_sensitivity.csv`         | Output variation across templates for the same question                                     |
+| `baseline_comparison.csv`        | Differences computed automatically **only when the same run contains both FP16 and packed** |
+| `run_metadata.json`, `report.md` | Config metadata and a human-readable report                                                 |
 
-```bash
-apbench validate configs/anyprecision_example.yaml
-apbench run configs/anyprecision_example.yaml
-```
+Because this guide splits FP16 and packed into two processes, **you will not automatically get a cross-process baseline comparison table**. To compare, align the raw records from the two results by the same `dataset_id`, `case_id`, `template_id`, and `repeat`, or compare the two `summary.csv` / `workload_summary.csv` files by corresponding groups; keep the run directories and their order.
 
-一条 `anyprecision` model 配置中的 `precisions: [5, 6, 7, 8]` 会复用同一个已加载模型，并在每次 `generate(..., precision=n)` 或 forward 时选择位宽。这才是对论文动态精度机制的直接测试。
+- `exact_match` requires the normalized full answers to be identical. If the prediction is `Answer: 115` and the reference is `115`, the score is 0; `contains_reference` would be 1, but it may misjudge a wrong answer that happens to contain the correct number. Decide the primary accuracy criterion in advance and spot-check samples.
+- `ttft_s` covers the time from the request to the first output token; even if the first generated token is EOS, the decoded answer may still be empty. `tps = (output_tokens - 1) / (wall_time_s - ttft_s)`; with fewer than two output tokens there is no TPS. `tokens_per_second` is a different rate computed over total generation time; do not mix them up.
+- Workloads are classified by **actual input token count**: small is 0–128, medium is 129–512, and large starts at 513. The medium/large names of questions in the dataset do not guarantee the grouping; check `sample_count` and `mean_input_tokens` in `workload_summary.csv`.
+- `peak_gpu_memory_used_mib` is the peak of whole-GPU memory sampled from `nvidia-smi` **during a single generation**; it does not include the peak during the entire model loading process, nor is it the memory exclusive to that precision. `torch_allocated_bytes` and `torch_reserved_bytes` use the PyTorch allocator's accounting.
 
-## 测量量化阶段，而不是把它误称为训练阶段
+### Memory Bias and Model Release
 
-Any-Precision 的 README 描述的是训练后量化流程：梯度敏感度计算、incremental upscaling/quantize、pack；它没有在这里重新训练 base LLM。可用下面的命令分别测量三个阶段：
+Currently `runner.py` calls `backend.close()` after each model finishes, but the existing backends do not implement explicit unloading. So if FP16 runs first and packed runs next in the same process, surviving references or the PyTorch cache may affect the subsequent whole-GPU memory readings. Merely adding `del backend; gc.collect(); torch.cuda.empty_cache()` does not guarantee that model tensors that are still referenced will be released, and it does not change the packed backend's design of **loading the same weights once to serve multiple bit widths**. Separate processes plus an idle-GPU baseline are better suited to comparing the resident footprint of FP16 versus packed; similar memory across w3–w8 cannot be used to claim that precision switching failed. To measure the exclusive loading cost of a specific bit width, you would need to design a model and corresponding backend that truly load only that bit width.
 
-```bash
-apbench profile-quantization \
-  --repo /path/to/any-precision-llm \
-  --model /models/base-llama \
-  --seed-precision 5 \
-  --parent-precision 8 \
-  --output results/quantization_profile.json
-```
+## Follow-up Research Checklist
 
-如果研究问题确实是“训练前后输出如何变化”，应该把 base checkpoint 与 fine-tuned checkpoints 各自配置成一个 `huggingface` model，并在完全相同的数据、tokenizer 与 generation 参数下比较。训练阶段本身主要产生 logits/loss/gradients，不是与推理文本一一对应的另一种“输出”。
+1. Report separately: quality, empty-answer rate, truncation rate, TTFT/TPS, runtime GPU memory, packed file size, and the time and resources of the gradient/quantization/packing stages.
+2. Record the base model revision, quantization config, CUDA/PyTorch/Transformers versions, and the GPU model tested; fix the data, templates, and generation settings.
+3. Compare both the 8→3 and 3→8 orders; record idle GPU memory from `nvidia-smi` before each launch, and do not mistake whole-GPU peaks from different experiments for the model's inherent size.
+4. After using multiple equivalent templates in formal QA, evaluate `prompt_sensitivity.csv` and the accuracy and empty-answer rate under different templates.
 
-## 数据格式
-
-QA/指令数据集采用 JSONL，每行至少包含：
-
-```json
-{"id":"q1","prompt":"What is 2 + 2?","reference":"4","metadata":{"category":"math"}}
-```
-
-语言模型/perplexity 数据集：
-
-```json
-{"id":"lm1","text":"Text whose next-token perplexity will be evaluated."}
-```
-
-Ollama 的 generate API 不能提供输入序列每个真实 token 的完整 logits，所以框架不会用生成 token 的 logprob 冒充标准 perplexity。`language_modeling` 任务只在 Any-Precision 和 Hugging Face 本地后端计算。
-
-## 输出
-
-每次运行生成一个带 UTC 时间戳的目录，其中包含：
-
-| 文件 | 用途 |
-| --- | --- |
-| `raw_results.jsonl` | 每个 model × precision × case × template × repeat 的原始输出与测量值 |
-| `summary.csv` | 平均质量、perplexity、P50/P95 延迟、吞吐、内存/显存等聚合结果 |
-| `baseline_comparison.csv` | 各量化方案相对 `baseline: true` 模型的绝对变化和百分比变化 |
-| `prompt_sensitivity.csv` | 同一题在不同 Prompt 模板下的输出分歧率与各质量指标跨度 |
-| `run_metadata.json` | 完整配置、Python/OS 环境与生成参数 |
-| `report.md` | 可快速阅读的实验表格 |
-
-主要资源字段：
-
-- `model_size_bytes` / `model_vram_bytes`：Ollama 对当前模型报告的驻留大小，最适合跨 Ollama variant 比较；
-- `model_artifact_size_bytes`：原生 Any-Precision packed artifact 的磁盘大小；
-- `peak_gpu_memory_used_mib`：`nvidia-smi` 的整机 GPU 峰值；
-- `peak_ollama_rss_bytes`：Ollama 进程 RSS 峰值；
-- `wall_time_s`、`tokens_per_second`：端到端延迟与 decode 吞吐；
-- `exact_match`、`contains_reference`、`token_f1`、`rouge_l`、`perplexity`：质量指标。
-
-## 对应你的三个研究问题
-
-### 1. 是否真的节省资源，精度是否下降？
-
-把同一个 base checkpoint 的 FP16 设为 `baseline: true`。优先查看 `baseline_comparison.csv`：
-
-- 内存节省率：`mean_model_vram_bytes_change_pct`（负数表示减少）；
-- 延迟变化：`p50_wall_time_s_change_pct`；
-- 吞吐变化：`mean_tokens_per_second_change_pct`；
-- QA 质量变化：`mean_exact_match_delta`、`mean_token_f1_delta`；
-- 语言建模退化：`mean_perplexity_change_pct`（正数通常表示变差）。
-
-Any-Precision 的“低成本部署多个尺寸”主张还需要做一个**组合存储实验**：比较一个 INT5–INT8 packed artifact 的磁盘大小，与四个独立 5/6/7/8-bit artifact 的总大小。单独比较 INT5 和 FP16 不能验证 overlay 带来的多精度部署收益。
-
-```bash
-apbench compare-storage \
-  --packed /models/anyprec-int5-int8 \
-  --independent /models/int5 /models/int6 /models/int7 /models/int8 \
-  --output results/storage_comparison.json
-```
-
-### 2. Prompt 灵敏度是否影响结果？
-
-在 dataset 的 `prompt_templates` 中放入语义相同、措辞不同的模板。查看 `prompt_sensitivity.csv`：
-
-- `unique_output_ratio` 越高，表示模板变化更容易改变输出；
-- `exact_match_range`/`token_f1_range` 越大，表示模板变化确实改变任务质量，而不只是措辞；
-- 应分别做 temperature=0 的确定性实验与 temperature>0 的采样实验。后者需要多个 seed，框架会令每个 repeat 使用 `seed + repeat`。
-
-### 3. 量化阶段与 inference 阶段如何变化？
-
-`profile-quantization` 回答量化管线的时间和资源代价；`apbench run` 回答产物在 inference 时的文本、质量与资源变化。若需要研究校准数据的影响，可以改变量化命令的 `dataset`、`num_examples` 与 `random_state`，生成多个 packed artifact，再把它们作为不同 model 加入同一 benchmark。
-
-## 推荐的正式实验规程
-
-1. 所有量化模型必须来自同一 base checkpoint，并记录 commit、模型 digest、tokenizer 与 quantizer 版本。
-2. 使用至少一个标准任务集；示例 `tiny_qa.jsonl` 只用于 smoke test，不能支撑论文结论。
-3. 固定 context length、最大输出 token、batch size、seed 和 Prompt；先 warm-up，再至少重复 5–10 次。
-4. 资源实验时保持机器空闲，并分开做 cold-load（包含加载）与 warm inference（排除加载）实验。
-5. 同时报告绝对值、相对 FP16 变化和置信区间；不要只报告“最多节省”。
-6. 为准确率设定预先阈值，例如“相对 FP16 的任务分数下降不超过 1%”，再判断某个位宽是否可接受。
-7. 对 INT5–INT8 使用相同样本顺序；若硬件支持，随机化 model 运行顺序以减少温度/系统状态偏差。
-
-## 当前限制与下一步
-
-- 当前内置指标适合短答案和基础文本重合；代码生成、摘要、对话、安全性需要接入 HumanEval、ROUGE/BERTScore、MT-Bench 或领域数据集。
-- `nvidia-smi` 是整卡采样，多租户环境会产生噪声；Ollama 的 `size_vram` 更适合判断单模型驻留大小。
-- 当前 runner 串行执行，避免显存竞争。并发 serving、吞吐随 batch/concurrency 的扩展应作为独立实验。
-- 原生 backend 按上游 README 的公开 API 编写；若你固定到某个 commit，应在首次运行后用一个小样本验证 `forward(..., precision=)` 与 `generate(..., precision=)` 的签名。
-
-## 测试
-
-```bash
-pytest
-```
-
-项目包含配置解析、文本指标和 Ollama API 映射的单元测试；不需要下载模型即可运行。
+All paths in this guide are placeholders. Actual measurement results depend on your WSL machine, the packed model, and `raw_results.jsonl`.
