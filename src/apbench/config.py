@@ -9,7 +9,7 @@ import yaml
 from .types import GenerationSettings
 
 
-SUPPORTED_BACKENDS = {"ollama", "anyprecision", "huggingface"}
+SUPPORTED_BACKENDS = {"anyprecision", "huggingface"}
 
 
 @dataclass(frozen=True)

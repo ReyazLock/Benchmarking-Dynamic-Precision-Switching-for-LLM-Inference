@@ -5,7 +5,7 @@ from apbench.config import load_config
 
 def test_example_config_is_valid():
     root = Path(__file__).parents[1]
-    config = load_config(root / "configs" / "ollama_example.yaml")
+    config = load_config(root / "configs" / "workload_qa_fp16_only.yaml")
 
     assert len(config.models) == 6
 

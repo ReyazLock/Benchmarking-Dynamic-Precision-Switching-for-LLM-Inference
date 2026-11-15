@@ -209,11 +209,23 @@ def run_benchmark(config: BenchmarkConfig) -> Path:
                         records.extend(_lm_records(backend, model, precision, dataset, config))
                 write_outputs(run_dir, records, metadata)
         finally:
+            import gc
+            import torch
+
+            def show_memory(stage):
+                torch.cuda.synchronize()
+                print(
+                    stage,
+                    "allocated GiB =", torch.cuda.memory_allocated() / 1024**3,
+                    "reserved GiB =", torch.cuda.memory_reserved() / 1024**3,
+                    flush=True,
+                )
+
+            show_memory(f"{model.id}: before cleanup")
             backend.close()
             del backend
-            import gc, torch
             gc.collect()
             torch.cuda.empty_cache()
-            torch.cuda.reset_peak_memory_stats()
+            show_memory(f"{model.id}: after cleanup")
     write_outputs(run_dir, records, metadata)
     return run_dir

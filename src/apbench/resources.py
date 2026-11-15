@@ -11,7 +11,6 @@ import psutil
 @dataclass
 class ResourceSnapshot:
     peak_benchmark_rss_bytes: int = 0
-    peak_ollama_rss_bytes: int = 0
     peak_system_memory_used_bytes: int = 0
     peak_gpu_memory_used_mib: float | None = None
     mean_gpu_utilization_pct: float | None = None
@@ -33,7 +32,6 @@ class ResourceSampler:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._rss: list[int] = []
-        self._ollama_rss: list[int] = []
         self._system_used: list[int] = []
         self._gpu_memory: list[float] = []
         self._gpu_util: list[float] = []
@@ -87,11 +85,6 @@ class ResourceSampler:
             try:
                 self._rss.append(process.memory_info().rss)
                 self._system_used.append(psutil.virtual_memory().used)
-                ollama_rss = 0
-                for candidate in psutil.process_iter(["name", "memory_info"]):
-                    if "ollama" in (candidate.info.get("name") or "").lower():
-                        ollama_rss += candidate.info["memory_info"].rss
-                self._ollama_rss.append(ollama_rss)
             except (psutil.Error, KeyError):
                 pass
             self._sample_gpu()
@@ -101,7 +94,6 @@ class ResourceSampler:
         mean = lambda values: sum(values) / len(values) if values else None
         return ResourceSnapshot(
             peak_benchmark_rss_bytes=max(self._rss, default=0),
-            peak_ollama_rss_bytes=max(self._ollama_rss, default=0),
             peak_system_memory_used_bytes=max(self._system_used, default=0),
             peak_gpu_memory_used_mib=max(self._gpu_memory) if self._gpu_memory else None,
             mean_gpu_utilization_pct=mean(self._gpu_util),
