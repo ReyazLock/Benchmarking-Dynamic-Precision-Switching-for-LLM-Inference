@@ -47,6 +47,7 @@ def summarize(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
             for item in items
             for field, value in item.items()
             if isinstance(value, (int, float)) and not isinstance(value, bool)
+            and field not in {"precision_bits", "repeat"}
         }
         for field in sorted(numeric_fields):
             values = [float(item[field]) for item in items if item.get(field) is not None]
@@ -62,8 +63,12 @@ def summarize(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for item in items:
             if "prediction" in item:
                 predictions[item["case_id"]].append(item["prediction"])
-        stability = [len(set(outputs)) / len(outputs) for outputs in predictions.values() if outputs]
-        row["mean_unique_output_ratio"] = _mean(stability)
+        stability = [
+            len(set(outputs)) / len(outputs)
+            for outputs in predictions.values() if len(outputs) > 1
+        ]
+        if stability:
+            row["mean_unique_output_ratio"] = _mean(stability)
         row["sample_count"] = len(items)
         rows.append(row)
     return rows
@@ -119,7 +124,8 @@ def summarize_workloads(
             "peak_gpu_memory_used_mib",
         ):
             values = [float(item[field]) for item in measured if item.get(field) is not None]
-            row[f"mean_{field}"] = _mean(values)
+            if values or field != "rouge_l":
+                row[f"mean_{field}"] = _mean(values)
         for field in ("ttft_s", "wall_time_s"):
             values = [float(item[field]) for item in measured if item.get(field) is not None]
             row[f"p50_{field}"] = _percentile(values, 0.50)
@@ -148,6 +154,11 @@ def write_outputs(run_dir: Path, records: list[dict[str, Any]], metadata: dict[s
         "p95_ttft_s", "mean_tps", "mean_wall_time_s", "p50_wall_time_s",
         "p95_wall_time_s", "mean_exact_match", "mean_contains_reference",
         "mean_token_f1", "mean_rouge_l", "mean_peak_gpu_memory_used_mib",
+    ]
+    workload_fields = [
+        field for field in workload_fields
+        if field != "mean_rouge_l"
+        or any(row.get(field) is not None for row in workload_rows)
     ]
     with (run_dir / "workload_summary.csv").open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=workload_fields)
@@ -279,6 +290,11 @@ def _write_markdown(path: Path, rows: list[dict[str, Any]], metadata: dict[str, 
         "mean_peak_gpu_memory_used_mib",
         "mean_model_vram_bytes",
     ]
+    columns = [
+        column for column in columns
+        if column in {"model_id", "precision_bits", "dataset_id", "template_id"}
+        or any(row.get(column) is not None for row in rows)
+    ]
     lines = [
         f"# Benchmark report: {metadata.get('run_name', '')}",
         "",
@@ -296,7 +312,8 @@ def _write_markdown(path: Path, rows: list[dict[str, Any]], metadata: dict[str, 
             "",
             "- Compare quality against the configured FP16 or highest-bit baseline; do not interpret bit-width alone as quality.",
             "- Whole-device GPU samples include other processes. Use an otherwise idle machine.",
-            "- `mean_unique_output_ratio` near 1 means repeated runs were unstable; near 0 is impossible, and 1/repeats is fully stable.",
+            *(["- `mean_unique_output_ratio` is calculated only for questions with repeated runs; 1/repeats is fully stable."]
+              if any("mean_unique_output_ratio" in row for row in rows) else []),
             "- Ollama's reported quantization string is authoritative for its model; `precision_bits` is only the experiment label.",
         ]
     )

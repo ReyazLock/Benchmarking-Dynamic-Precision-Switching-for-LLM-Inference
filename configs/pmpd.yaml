@@ -1,13 +1,13 @@
-run_name: tinyllama-workload-qa
+run_name: pmpd-p8-d73-hb64
 output_dir: ../results
-repeats: 2
+repeats: 1
 warmup_runs: 2
+resource_sample_interval_s: 0.1
 
-# Inclusive input-token ranges; choose two or three contiguous ranges.
 workload_ranges:
-  - {id: small, min_tokens: 0, max_tokens: 128}
-  - {id: medium, min_tokens: 129, max_tokens: 512}
-  - {id: large, min_tokens: 513}
+  - {id: small, min_tokens: 0, max_tokens: 512}
+  - {id: medium, min_tokens: 513, max_tokens: 1200}
+  - {id: large, min_tokens: 1201}
 
 generation:
   max_new_tokens: 64
@@ -16,25 +16,29 @@ generation:
   seed: 42
 
 models:
-  - id: tinyllama-anyprecision-w3-w8
-    backend: anyprecision
+  - id: pmpd-p8-d73-hb64
+    backend: pmpd
     model: /mnt/d/MingzhiCai/Rayze/Folder/InternationalCourses/WashU/Master_Degree/ANYLLM/any-precision-llm/cache_tinyllama_formal/packed/anyprec-(TinyLlama-1.1B-Chat-v1.0)-w8_orig3-gc1-c4_s100_blk512
-    precisions: [3,4,5,6,7,8]
-    baseline: false
     device: cuda
-    trust_remote_code: false
+    precision_bits: 7       # high precision; one scheduled run, not six runs
+    precisions: [3, 7, 8]  # packed weights available to PMPD
+    extra_options:
+      scheduler: naive
+      prefill_precision: 8
+      low_precision: 3
+      high_bit_steps: 64
 
 datasets:
-  - id: formal_qa_workload_paired
-    path: ../datasets/formal_qa_workload_paired.jsonl
+  - id: workload_3len
+    path: ../datasets/workload_3len_v4.jsonl
     task: qa
-    metrics: 
+    metrics:
       - contains_reference
       - exact_match
       - concise_hit
       - contains_reference_anywhere
       - token_f1
+      - empty_answer
     prompt_templates:
       - "Answer with only the final answer. Question: {prompt}"
       - "Solve the following problem carefully, then print only the answer: {prompt}"
-

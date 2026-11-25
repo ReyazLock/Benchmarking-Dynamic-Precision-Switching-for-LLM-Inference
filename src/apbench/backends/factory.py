@@ -11,4 +11,8 @@ def create_backend(config: ModelConfig) -> Backend:
         return AnyPrecisionBackend(config)
     if config.backend == "huggingface":
         return HuggingFaceBackend(config)
+    if config.backend == "pmpd":
+        from .pmpd import PMPDBackend
+
+        return PMPDBackend(config)
     raise ValueError(f"Unsupported backend: {config.backend}")

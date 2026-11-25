@@ -9,7 +9,7 @@ import yaml
 from .types import GenerationSettings
 
 
-SUPPORTED_BACKENDS = {"anyprecision", "huggingface"}
+SUPPORTED_BACKENDS = {"anyprecision", "huggingface", "pmpd"}
 
 
 @dataclass(frozen=True)
@@ -41,6 +41,9 @@ class ModelConfig:
     extra_options: dict[str, Any] = field(default_factory=dict)
 
     def variants(self) -> tuple[int | None, ...]:
+        if self.backend == "pmpd":
+            # PMPD uses these precisions within one generation, not separate runs.
+            return (self.precision_bits,)
         return self.precisions or (self.precision_bits,)
 
 
@@ -87,11 +90,28 @@ def load_config(path: str | Path) -> BenchmarkConfig:
             raise ValueError(f"Unsupported backend: {backend}")
         precision = item.get("precision_bits")
         precisions = tuple(int(value) for value in item.get("precisions", []))
-        all_bits = precisions or (() if precision is None else (int(precision),))
+        all_bits = (*precisions, *((int(precision),) if precision is not None else ()))
         if any(value < 3 or value > 16 for value in all_bits):
             raise ValueError("precision values must be between 3 and 16")
         if backend == "anyprecision" and not precisions:
             raise ValueError("anyprecision models require a 'precisions' list")
+        extra_options = dict(item.get("extra_options", {}))
+        if backend == "pmpd":
+            if not precisions or precision is None:
+                raise ValueError("pmpd requires 'precisions' and high 'precision_bits'")
+            if int(precision) not in precisions:
+                raise ValueError("pmpd precision_bits must be in precisions")
+            if extra_options.get("scheduler", "naive") != "naive":
+                raise ValueError("pmpd currently supports only the naive static scheduler")
+            low = int(extra_options.get("low_precision", min(precisions)))
+            prefill = int(extra_options.get("prefill_precision", precision))
+            if low not in precisions or prefill not in precisions or low >= int(precision):
+                raise ValueError("pmpd requires available low < high and available prefill precision")
+            steps = int(extra_options.get("high_bit_steps", 16))
+            if steps < 0:
+                raise ValueError("pmpd high_bit_steps must be >= 0")
+            if generation.temperature != 0:
+                raise ValueError("pmpd currently requires generation.temperature: 0")
         models.append(
             ModelConfig(
                 id=str(_require(item, "id", "models[]")),
@@ -104,7 +124,7 @@ def load_config(path: str | Path) -> BenchmarkConfig:
                 keep_alive=str(item.get("keep_alive", "5m")),
                 trust_remote_code=bool(item.get("trust_remote_code", False)),
                 device=str(item.get("device", "cuda")),
-                extra_options=dict(item.get("extra_options", {})),
+                extra_options=extra_options,
             )
         )
 

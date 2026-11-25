@@ -1,0 +1,27 @@
+diff --git a/pmpd/modules/model.py b/pmpd/modules/model.py
+--- a/pmpd/modules/model.py
++++ b/pmpd/modules/model.py
+@@ -2,7 +2,10 @@ from torch import nn
+ import torch
+ from any_precision import AnyPrecisionForCausalLM
+ from .zoo import MultiPrecModelWrapper
+-from auto_gptq import AutoGPTQForCausalLM
++try:
++    from auto_gptq import AutoGPTQForCausalLM
++except ImportError:
++    AutoGPTQForCausalLM = None  # only needed when use_anyprec=False
+ from transformers.generation.utils import ModelOutput
+ from transformers import AutoTokenizer
+ from collections import defaultdict
+diff --git a/pmpd/modules/zoo.py b/pmpd/modules/zoo.py
+--- a/pmpd/modules/zoo.py
++++ b/pmpd/modules/zoo.py
+@@ -1,6 +1,9 @@
+ import torch
+ import torch.nn as nn
+-from auto_gptq import AutoGPTQForCausalLM
++try:
++    from auto_gptq import AutoGPTQForCausalLM
++except ImportError:
++    AutoGPTQForCausalLM = None  # only needed for the GPTQ model wrapper
+ import json

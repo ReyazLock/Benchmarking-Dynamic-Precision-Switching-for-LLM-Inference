@@ -1,13 +1,13 @@
-run_name: tinyllama-workload-qa
+run_name: anyllm-w4
 output_dir: ../results
-repeats: 2
+repeats: 1
 warmup_runs: 2
 
 # Inclusive input-token ranges; choose two or three contiguous ranges.
 workload_ranges:
-  - {id: small, min_tokens: 0, max_tokens: 128}
-  - {id: medium, min_tokens: 129, max_tokens: 512}
-  - {id: large, min_tokens: 513}
+  - {id: small, min_tokens: 0, max_tokens: 512}
+  - {id: medium, min_tokens: 513, max_tokens: 1200}
+  - {id: large, min_tokens: 1201}
 
 generation:
   max_new_tokens: 64
@@ -16,20 +16,17 @@ generation:
   seed: 42
 
 models:
-  - id: tinyllama-fp16
-    backend: huggingface
-    model: TinyLlama/TinyLlama-1.1B-Chat-v1.0
-    precision_bits: 16
-    baseline: true
+  - id: tinyllama-anyprecision-w4
+    backend: anyprecision
+    model: /mnt/d/MingzhiCai/Rayze/Folder/InternationalCourses/WashU/Master_Degree/ANYLLM/any-precision-llm/cache_tinyllama_formal/packed/anyprec-(TinyLlama-1.1B-Chat-v1.0)-w8_orig3-gc1-c4_s100_blk512
+    precisions: [4]
+    baseline: false
     device: cuda
     trust_remote_code: false
-    extra_options:
-      dtype: float16
-      use_fast: false
 
 datasets:
-  - id: formal_qa_workload_paired
-    path: ../datasets/formal_qa_workload_paired.jsonl
+  - id: workload_3len
+    path: ../datasets/workload_3len_v4.jsonl
     task: qa
     metrics: 
       - contains_reference
@@ -40,4 +37,3 @@ datasets:
     prompt_templates:
       - "Answer with only the final answer. Question: {prompt}"
       - "Solve the following problem carefully, then print only the answer: {prompt}"
-

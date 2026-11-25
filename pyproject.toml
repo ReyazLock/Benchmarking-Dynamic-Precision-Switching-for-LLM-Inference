@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "anyprecision-bench"
 version = "0.1.0"
-description = "Reproducible INT3-INT8 LLM quantization benchmark for Ollama and Any-Precision LLM"
+description = "Reproducible INT3-INT8 benchmark for Any-Precision LLM, PMPD, and other backends"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
